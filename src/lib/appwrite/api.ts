@@ -307,12 +307,13 @@ export async function deletePost(postId?: string, imageId?: string) {
   }
 }
 
-export async function getInfinitePosts({ pageParam }: { pageParam: number }) {
+export async function getInfinitePosts({ pageParam }: { pageParam: string }) {
   const queries = [Query.orderDesc("$updatedAt"), Query.limit(9)];
 
   if (pageParam) {
     queries.push(Query.cursorAfter(pageParam.toString()));
   }
+  console.log({ queries });
 
   try {
     const posts = await databases.listDocuments(

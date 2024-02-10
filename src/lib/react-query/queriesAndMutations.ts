@@ -178,13 +178,21 @@ export const useGetPosts = () => {
   return useInfiniteQuery({
     queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
     queryFn: getInfinitePosts,
-    getNextPageParam: (lastPage) => {
-      if (lastPage && lastPage.documents.length === 0) {
+    initialPageParam:"",
+    getNextPageParam: (lastPage): string | null | undefined => {
+      console.log({ lastPage });
+      if (
+        !lastPage ||
+        (lastPage && lastPage.documents.length === 0) ||
+        !lastPage?.documents
+      ) {
         return null;
       }
+      const lastIndex = lastPage?.documents.length - 1;
 
       // Use the $id of the last document as the cursor.
-      const lastId = lastPage.documents[lastPage.documents.length - 1].$id;
+      const lastId = lastPage.documents[lastIndex].$id;
+
       return lastId;
     },
   });
