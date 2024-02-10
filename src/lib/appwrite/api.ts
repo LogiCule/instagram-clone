@@ -288,7 +288,6 @@ export async function updatePost(post: IUpdatePost) {
 }
 export async function deletePost(postId?: string, imageId?: string) {
   if (!postId || !imageId) return;
-  console.log({ postId, imageId });
 
   try {
     const statusCode = await databases.deleteDocument(
@@ -313,7 +312,6 @@ export async function getInfinitePosts({ pageParam }: { pageParam: string }) {
   if (pageParam) {
     queries.push(Query.cursorAfter(pageParam.toString()));
   }
-  console.log({ queries });
 
   try {
     const posts = await databases.listDocuments(

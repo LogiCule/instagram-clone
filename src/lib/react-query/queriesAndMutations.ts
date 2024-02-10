@@ -180,7 +180,6 @@ export const useGetPosts = () => {
     queryFn: getInfinitePosts,
     initialPageParam:"",
     getNextPageParam: (lastPage): string | null | undefined => {
-      console.log({ lastPage });
       if (
         !lastPage ||
         (lastPage && lastPage.documents.length === 0) ||
