@@ -1,6 +1,27 @@
 import { INewPost, INewUser, IUpdatePost } from "@/types";
-import { ID, Query } from "appwrite";
+import { ID, Query, Models } from "appwrite";
 import { account, appwriteConfig, avatars, databases, storage } from "./config";
+
+export async function getUsers(limit?: number) {
+  const queries: any[] = [Query.orderDesc("$createdAt")];
+  if (limit) {
+    queries.push(Query.limit(limit));
+  }
+
+  try {
+    const users = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      queries
+    );
+
+    if (!users) throw Error;
+
+    return users;
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 export async function createUserAccount(user: INewUser) {
   try {
@@ -73,10 +94,63 @@ export async function getCurrentuser() {
   }
 }
 
+export async function getUserById(userId: string) {
+  try {
+    const user = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      userId
+    );
+    if (!user) throw Error;
+    return user;
+  } catch (error) {
+    console.log(error);
+    // return {};
+  }
+}
+
 export async function signOutAccount() {
   try {
     const session = await account.deleteSession("current");
     return session;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getUserPosts(userId: string) {
+  if (!userId) return;
+
+  try {
+    const post = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.postCollectionId,
+      [Query.equal("creator", userId), Query.orderDesc("$createdAt")]
+    );
+
+    if (!post) throw Error;
+
+    return post;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getUserLikedPosts(userId: string) {
+  try {
+    const post = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.postCollectionId,
+      [Query.orderDesc("$createdAt"), Query.limit(100)]
+    );
+
+    if (!post) throw Error;
+
+    const likedPosts = post.documents.filter((post) =>
+      post.likes.some((user: Models.Document) => user.$id === userId)
+    );
+
+    return { ...post, documents: likedPosts, total: likedPosts.length };
   } catch (error) {
     console.log(error);
   }

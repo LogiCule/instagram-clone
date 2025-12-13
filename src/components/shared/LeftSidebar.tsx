@@ -32,7 +32,7 @@ const LeftSidebar = () => {
         </Link>
 
         <Link
-          to={"/" || `/profile/${user.id}`}
+          to={`/profile/${user.id}`}
           className="flex gap-3 items-center"
         >
           <img
